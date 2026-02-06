@@ -21,8 +21,6 @@
 
 ## Base URLs
 
-https://lobster-app-74s7m.ondigitalocean.app
-
 - **V1 API**: `/api/v1`
 - **V2 API**: `/api/v2`
 
@@ -252,19 +250,72 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `GET /api/v1/users/me`
 - **Access**: Authenticated (All roles)
-- **Output**: User profile object
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "user": {
+      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "role": "USER",
+      "profilePicture": "https://cdn.example.com/profiles/user123.jpg",
+      "isEmailVerified": true,
+      "is2FAEnabled": false,
+      "feedbackEmailsEnabled": true,
+      "loginHistoryEnabled": true,
+      "workRole": "developer",
+      "phone": "+1234567890",
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "lastLoginAt": "2024-02-06T15:20:00.000Z"
+    }
+  }
+}
+```
 
 #### 2. Update Profile Image
 
 - **Endpoint**: `PATCH /api/v1/users/update-profile-image`
 - **Access**: Authenticated (All roles)
-- **Input**: Multipart form-data with `profilePicture` field
-- **Allowed**: JPEG, PNG, WebP (max 1 file)
+- **Input**: Multipart form-data
+  - Field name: `profilePicture`
+  - Allowed types: JPEG, PNG, WebP
+  - Max files: 1
+  - Max size: Configured in server
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Profile image updated successfully",
+  "data": {
+    "profilePicture": "https://cdn.example.com/profiles/user123_updated.jpg"
+  }
+}
+```
 
 #### 3. Toggle Feedback Emails
 
 - **Endpoint**: `PATCH /api/v1/users/profile/feedback-emails`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Feedback emails preference updated",
+  "data": {
+    "feedbackEmailsEnabled": true
+  }
+}
+```
+
+---
 
 ### Device Management
 
@@ -272,16 +323,72 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `GET /api/v1/users/profile/devices`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "devices": [
+      {
+        "deviceId": "65f1a2b3c4d5e6f7g8h9i0k4",
+        "deviceName": "Chrome on Windows",
+        "deviceType": "desktop",
+        "browser": "Chrome 121.0",
+        "os": "Windows 11",
+        "ipAddress": "192.168.1.100",
+        "lastActive": "2024-02-06T16:30:00.000Z",
+        "isCurrent": true
+      },
+      {
+        "deviceId": "65f1a2b3c4d5e6f7g8h9i0k5",
+        "deviceName": "Safari on iPhone",
+        "deviceType": "mobile",
+        "browser": "Safari 17.2",
+        "os": "iOS 17.2",
+        "ipAddress": "192.168.1.101",
+        "lastActive": "2024-02-05T14:20:00.000Z",
+        "isCurrent": false
+      }
+    ],
+    "total": 2
+  }
+}
+```
 
 #### 5. Logout Device
 
 - **Endpoint**: `DELETE /api/v1/users/profile/devices/:deviceId`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Device logged out successfully"
+}
+```
 
 #### 6. Logout All Devices
 
 - **Endpoint**: `POST /api/v1/users/profile/devices/logout-all`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "All devices logged out successfully",
+  "data": {
+    "devicesLoggedOut": 3
+  }
+}
+```
+
+---
 
 ### 2FA Management
 
@@ -289,7 +396,20 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `POST /api/v1/users/profile/2fa/enable`
 - **Access**: Authenticated (All roles)
-- **Output**: QR code and secret
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "2FA setup initiated",
+  "data": {
+    "secret": "JBSWY3DPEHPK3PXP",
+    "qrCode": "data:image/png;base64,iVBORw0KGgoAAAANS...",
+    "backupCodes": ["12345678", "87654321", "11223344"]
+  }
+}
+```
 
 #### 8. Verify 2FA
 
@@ -299,7 +419,20 @@ Authorization: Bearer <access_token>
 
 ```json
 {
-  "token": "string (6-digit code)"
+  "token": "123456"
+}
+```
+
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "2FA enabled successfully",
+  "data": {
+    "is2FAEnabled": true
+  }
 }
 ```
 
@@ -307,6 +440,28 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `POST /api/v1/users/profile/2fa/disable`
 - **Access**: Authenticated (All roles)
+- **Input**:
+
+```json
+{
+  "password": "current_password"
+}
+```
+
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "2FA disabled successfully",
+  "data": {
+    "is2FAEnabled": false
+  }
+}
+```
+
+---
 
 ### Login History
 
@@ -314,11 +469,48 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `GET /api/v1/users/profile/login-history/last`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "lastLogin": {
+      "timestamp": "2024-02-06T15:20:00.000Z",
+      "ipAddress": "192.168.1.100",
+      "location": "New York, USA",
+      "device": "Chrome on Windows",
+      "successful": true
+    },
+    "previousLogin": {
+      "timestamp": "2024-02-05T09:15:00.000Z",
+      "ipAddress": "192.168.1.101",
+      "location": "New York, USA",
+      "device": "Safari on iPhone"
+    }
+  }
+}
+```
 
 #### 11. Toggle Login History
 
 - **Endpoint**: `PATCH /api/v1/users/profile/login-history/toggle`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Login history tracking updated",
+  "data": {
+    "loginHistoryEnabled": true
+  }
+}
+```
+
+---
 
 ### Thread Management
 
@@ -326,26 +518,94 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `POST /api/v1/users/profile/threads/archive-all`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "All threads archived successfully",
+  "data": {
+    "threadsArchived": 15
+  }
+}
+```
 
 #### 13. Get Archived Threads
 
 - **Endpoint**: `GET /api/v1/users/profile/threads/archived`
 - **Access**: Authenticated (All roles)
+- **Query Params**: `page`, `limit`
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "threads": [
+      {
+        "id": "65f1a2b3c4d5e6f7g8h9i0k1",
+        "title": "Archived Conversation",
+        "modelUsed": "gpt-4",
+        "messageCount": 10,
+        "archivedAt": "2024-02-01T10:00:00.000Z",
+        "createdAt": "2024-01-25T14:30:00.000Z"
+      }
+    ],
+    "total": 15,
+    "page": 1,
+    "limit": 10
+  }
+}
+```
 
 #### 14. Delete All Threads
 
 - **Endpoint**: `DELETE /api/v1/users/profile/threads/delete-all`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "All threads deleted successfully",
+  "data": {
+    "threadsDeleted": 25
+  }
+}
+```
 
 #### 15. Archive Single Thread
 
 - **Endpoint**: `PATCH /api/v1/users/profile/threads/:threadId/archive`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Thread archived successfully"
+}
+```
 
 #### 16. Unarchive Thread
 
 - **Endpoint**: `PATCH /api/v1/users/profile/threads/:threadId/unarchive`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Thread unarchived successfully"
+}
+```
+
+---
 
 ### Admin Operations
 
@@ -353,32 +613,173 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `GET /api/v1/users`
 - **Access**: ADMIN, SUPER_ADMIN
-- **Query Params**: Pagination, filters
+- **Query Params**:
+  - `page` (default: 1)
+  - `limit` (default: 10, max: 100)
+  - `search` (search by name or email)
+  - `role` (filter by role)
+  - `isEmailVerified` (true/false)
+  - `sortBy` (createdAt, name, email)
+  - `sortOrder` (asc, desc)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "users": [
+      {
+        "id": "65f1a2b3c4d5e6f7g8h9i0j1",
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "role": "USER",
+        "isEmailVerified": true,
+        "createdAt": "2024-01-15T10:30:00.000Z",
+        "lastLoginAt": "2024-02-06T15:20:00.000Z"
+      }
+    ],
+    "pagination": {
+      "total": 150,
+      "page": 1,
+      "limit": 10,
+      "totalPages": 15
+    }
+  }
+}
+```
 
 #### 18. Get User Statistics
 
 - **Endpoint**: `GET /api/v1/users/statistics`
 - **Access**: ADMIN, SUPER_ADMIN
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "totalUsers": 1500,
+    "activeUsers": 1200,
+    "newUsersThisMonth": 150,
+    "usersByRole": {
+      "USER": 1300,
+      "WORKSPACE_USER": 150,
+      "WORKSPACE_ADMIN": 30,
+      "ADMIN": 15,
+      "SUPER_ADMIN": 5
+    },
+    "verifiedUsers": 1400,
+    "users2FAEnabled": 450
+  }
+}
+```
 
 #### 19. Get User by ID
 
 - **Endpoint**: `GET /api/v1/users/:id`
 - **Access**: Authenticated (All roles)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "user": {
+      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "role": "USER",
+      "profilePicture": "https://cdn.example.com/profiles/user123.jpg",
+      "isEmailVerified": true,
+      "workRole": "developer",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  }
+}
+```
 
 #### 20. Update User
 
 - **Endpoint**: `PATCH /api/v1/users/:id`
-- **Access**: Authenticated (All roles)
+- **Access**: Authenticated (All roles - own profile only, unless admin)
+- **Input**:
+
+```json
+{
+  "name": "John Smith",
+  "phone": "+1234567891",
+  "workRole": "product_manager | developer | designer | marketing | sales | student | researcher | writer | other"
+}
+```
+
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User updated successfully",
+  "data": {
+    "user": {
+      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "name": "John Smith",
+      "phone": "+1234567891",
+      "workRole": "product_manager",
+      "updatedAt": "2024-02-06T16:30:00.000Z"
+    }
+  }
+}
+```
 
 #### 21. Update User by Admin
 
 - **Endpoint**: `PATCH /api/v1/users/update/:id`
 - **Access**: ADMIN, SUPER_ADMIN
+- **Input**:
+
+```json
+{
+  "name": "John Smith",
+  "email": "john.smith@example.com",
+  "phone": "+1234567891",
+  "workRole": "developer"
+}
+```
+
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User updated successfully by admin",
+  "data": {
+    "user": {
+      "id": "65f1a2b3c4d5e6f7g8h9i0j1",
+      "name": "John Smith",
+      "email": "john.smith@example.com",
+      "updatedAt": "2024-02-06T16:30:00.000Z"
+    }
+  }
+}
+```
 
 #### 22. Delete User
 
 - **Endpoint**: `DELETE /api/v1/users/:id`
 - **Access**: ADMIN, SUPER_ADMIN
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
 
 #### 23. Update User Role
 
@@ -388,13 +789,66 @@ Authorization: Bearer <access_token>
 
 ```json
 {
-  "role": "USER | ADMIN | WORKSPACE_ADMIN | WORKSPACE_USER"
+  "role": "USER | ADMIN | WORKSPACE_ADMIN | WORKSPACE_USER | SUPER_ADMIN"
 }
 ```
 
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User role updated successfully",
+  "data": {
+    "userId": "65f1a2b3c4d5e6f7g8h9i0j1",
+    "newRole": "ADMIN"
+  }
+}
+```
+
+#### 24. Get User Devices (Admin)
+
+- **Endpoint**: `GET /api/v1/users/:id/devices`
+- **Access**: ADMIN, SUPER_ADMIN
+- **Output**: Same as "Get My Devices" but for specified user
+
+#### 25. Logout User Device (Admin)
+
+- **Endpoint**: `DELETE /api/v1/users/:id/devices/:deviceId`
+- **Access**: ADMIN, SUPER_ADMIN
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User device logged out successfully"
+}
+```
+
+#### 26. Logout All User Devices (Admin)
+
+- **Endpoint**: `POST /api/v1/users/:id/devices/logout-all`
+- **Access**: ADMIN, SUPER_ADMIN
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "All user devices logged out successfully",
+  "data": {
+    "devicesLoggedOut": 5
+  }
+}
+```
+
+---
+
 ### Email Change
 
-#### 24. Request Email Change
+#### 27. Request Email Change
 
 - **Endpoint**: `POST /api/v1/users/change-email/request`
 - **Access**: USER, WORKSPACE_ADMIN, WORKSPACE_USER
@@ -402,11 +856,24 @@ Authorization: Bearer <access_token>
 
 ```json
 {
-  "newEmail": "string"
+  "newEmail": "newemail@example.com"
 }
 ```
 
-#### 25. Verify Email Change
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Verification code sent to new email",
+  "data": {
+    "expiresIn": "15 minutes"
+  }
+}
+```
+
+#### 28. Verify Email Change
 
 - **Endpoint**: `POST /api/v1/users/change-email/verify`
 - **Access**: USER, WORKSPACE_ADMIN, WORKSPACE_USER
@@ -414,21 +881,114 @@ Authorization: Bearer <access_token>
 
 ```json
 {
-  "otp": "string"
+  "otp": "123456"
 }
 ```
 
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Email changed successfully",
+  "data": {
+    "newEmail": "newemail@example.com"
+  }
+}
+```
+
+---
+
 ### Account Deletion
 
-#### 26. Request Account Deletion
+#### 29. Request Account Deletion
 
 - **Endpoint**: `POST /api/v1/users/delete/request`
 - **Access**: Authenticated (All roles)
+- **Output**:
 
-#### 27. Confirm Account Deletion
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Account deletion request initiated. Confirmation email sent.",
+  "data": {
+    "confirmationRequired": true,
+    "expiresIn": "24 hours"
+  }
+}
+```
+
+#### 30. Confirm Account Deletion
 
 - **Endpoint**: `POST /api/v1/users/delete/confirm`
 - **Access**: Authenticated (All roles)
+- **Input**:
+
+```json
+{
+  "confirmationCode": "string",
+  "password": "current_password"
+}
+```
+
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Account deletion confirmed. Your account will be deleted within 30 days."
+}
+```
+
+---
+
+### Password Management (Admin)
+
+#### 31. Get User Password Info
+
+- **Endpoint**: `GET /api/v1/users/:id/password-info`
+- **Access**: ADMIN, SUPER_ADMIN
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "hasPassword": true,
+    "lastPasswordChange": "2024-01-15T10:30:00.000Z",
+    "passwordStrength": "strong"
+  }
+}
+```
+
+#### 32. Reset User Password (Admin)
+
+- **Endpoint**: `POST /api/v1/users/:id/reset-password`
+- **Access**: ADMIN, SUPER_ADMIN
+- **Input**:
+
+```json
+{
+  "newPassword": "NewSecurePass123!"
+}
+```
+
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User password reset successfully",
+  "data": {
+    "passwordResetAt": "2024-02-06T16:30:00.000Z"
+  }
+}
+```
 
 ---
 
@@ -1418,16 +1978,6 @@ All API responses follow this structure:
 5. **SSL Commerz**: Payment endpoints integrate with SSL Commerz payment gateway
 
 ---
-
-## Supported Providers
-
-### LLM Providers
-
-- **openai**: gpt-4, gpt-4-turbo, gpt-3.5-turbo
-- **gemini**: gemini-pro, gemini-pro-vision
-- **claude**: claude-3-opus, claude-3-sonnet, claude-3-haiku
-- **grok**: grok-1, grok-2
-- **deepseek**: deepseek-chat, deepseek-coder
 
 ### Tool Providers
 

@@ -3,7 +3,7 @@
 ## Table of Contents
 
 1. [Authentication](#authentication)
-2. [Users](#users)
+2. [Users](https://github.com/hammadsadi/test-repo/blob/main/User.md)
 3. [Workspace](#workspace)
 4. [Subscriptions](#subscriptions)
 5. [Plans V2](#plans-v2)

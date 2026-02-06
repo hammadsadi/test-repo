@@ -21,6 +21,8 @@
 
 ## Base URLs
 
+https://lobster-app-74s7m.ondigitalocean.app
+
 - **V1 API**: `/api/v1`
 - **V2 API**: `/api/v2`
 

@@ -1,5 +1,3 @@
----
-
 ## Base URLs
 
 https://lobster-app-74s7m.ondigitalocean.app

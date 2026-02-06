@@ -1416,7 +1416,6 @@ All API responses follow this structure:
 3. **Rate Limiting**: Some endpoints have rate limiting (currently commented out in code)
 4. **Pagination**: List endpoints typically support pagination via query parameters
 5. **SSL Commerz**: Payment endpoints integrate with SSL Commerz payment gateway
-6. **Detailed Examples**: See `API_DETAILED_EXAMPLES.md` for comprehensive real-world request/response examples
 
 ---
 

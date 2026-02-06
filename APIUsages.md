@@ -236,11 +236,67 @@ Authorization: Bearer <access_token>
 
 - **Endpoint**: `POST /api/v1/auth/logout`
 - **Access**: Authenticated (USER, ADMIN)
+- **Headers**:
+
+```
+Authorization: Bearer <access_token>
+```
+
+- **Input**: No body required (uses token from header)
+- **Output**:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Logged out successfully",
+  "data": {
+    "loggedOutAt": "2024-02-06T16:50:00.000Z"
+  }
+}
+```
+
+- **Notes**:
+  - Invalidates the current access token
+  - Removes refresh token from server
+  - Clears authentication cookies if present
+  - User must login again to access protected routes
 
 #### 11. Get User by Email
 
 - **Endpoint**: `GET /api/v1/auth/user/:email`
 - **Access**: Public
+- **Example**: `GET /api/v1/auth/user/john.doe@example.com`
+- **Output** (User exists):
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "data": {
+    "exists": true,
+    "user": {
+      "email": "john.doe@example.com",
+      "name": "John Doe",
+      "profilePicture": "https://cdn.example.com/profiles/user123.jpg",
+      "isEmailVerified": true
+    }
+  }
+}
+```
+
+- **Output** (User not found):
+
+```json
+{
+  "statusCode": 404,
+  "success": false,
+  "message": "User not found",
+  "data": {
+    "exists": false
+  }
+}
+```
 
 ---
 

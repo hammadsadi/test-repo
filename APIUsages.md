@@ -21,6 +21,8 @@
 
 ## Base URLs
 
+https://lobster-app-74s7m.ondigitalocean.app
+
 - **V1 API**: `/api/v1`
 - **V2 API**: `/api/v2`
 
@@ -1434,11 +1436,3 @@ All API responses follow this structure:
 - **quillbot**
 - **gptzero**
 - **hixbypass**
-
----
-
-## Additional Resources
-
-- **Detailed Examples**: `API_DETAILED_EXAMPLES.md` - Comprehensive input/output examples for all endpoints
-- **Authentication Guide**: `authUsages.md` - Detailed authentication implementation guide
-- **Security Documentation**: `SECURITY.md` - Security best practices and guidelines

@@ -1,5 +1,13 @@
 # Subscription Module API Documentation
 
+## Base URLs
+
+https://lobster-app-74s7m.ondigitalocean.app
+
+- **V1 API**: `/api/v1`
+
+---
+
 This document provides a comprehensive list of all APIs in the Subscription module with their input/output schemas.
 
 ## Table of Contents
